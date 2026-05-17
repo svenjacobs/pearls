@@ -1,0 +1,7 @@
+# Pearls cleanup job — deletes stale games and orphaned sessions from Redis.
+# Runs daily at 03:00. Adjust CLEANUP_URL if the app is on a different host/port.
+#
+# Environment variables (CLEANUP_SECRET, CLEANUP_URL) are exported by the
+# container entrypoint from /etc/environment before crond starts.
+
+0 3 * * *	. /etc/environment; curl -sf -X POST "${CLEANUP_URL}/api/admin/cleanup" -H "Authorization: Bearer ${CLEANUP_SECRET}" -o /dev/null && echo "[$(date -Iseconds)] cleanup ok" || echo "[$(date -Iseconds)] cleanup failed" >> /var/log/cleanup.log 2>&1

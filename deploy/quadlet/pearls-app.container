@@ -1,0 +1,17 @@
+[Unit]
+Description=Pearls SvelteKit application
+After=pearls-pod.service pearls-redis.service
+PartOf=pearls-pod.service
+
+[Container]
+ContainerName=pearls-app
+Image=localhost/pearls:latest
+Pod=pearls.pod
+EnvironmentFile=/etc/pearls/pearls.env
+Volume=/var/log/pearls:/var/log/pearls:z
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target

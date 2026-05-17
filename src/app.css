@@ -1,0 +1,38 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/lora';
+@import '@fontsource-variable/plus-jakarta-sans';
+@plugin '@iconify/tailwind4' {
+  prefix: 'iconify';
+  prefixes: heroicons;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Lora Variable', ui-serif, Georgia, serif;
+}
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100;
+  }
+}
+
+/*
+ * Applied briefly to <html> when the user switches colour themes.
+ * Forces a uniform 250 ms colour transition on every element, overriding
+ * component-level transition utilities for the duration. Removed by JS after
+ * 250 ms so normal component transitions resume immediately afterwards.
+ */
+.theme-transition,
+.theme-transition *,
+.theme-transition *::before,
+.theme-transition *::after {
+  transition:
+    color 250ms ease,
+    background-color 250ms ease,
+    border-color 250ms ease,
+    fill 250ms ease,
+    stroke 250ms ease !important;
+}

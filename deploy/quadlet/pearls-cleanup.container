@@ -1,0 +1,19 @@
+[Unit]
+Description=Pearls cleanup cron job
+After=pearls-pod.service pearls-app.service
+PartOf=pearls-pod.service
+
+[Container]
+ContainerName=pearls-cleanup
+Image=alpine
+Pod=pearls.pod
+EnvironmentFile=/etc/pearls/pearls.env
+Environment=CLEANUP_URL=http://localhost:3000
+Exec=sh -c "printf 'CLEANUP_SECRET=%s\nCLEANUP_URL=%s\n' \"$CLEANUP_SECRET\" \"$CLEANUP_URL\" > /etc/environment && apk add -q --no-cache curl && crond -f -l 2"
+Volume=%h/.config/containers/systemd/pearls-cleanup.cron:/etc/crontabs/root:ro
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,12 @@
+[Unit]
+Description=Pearls game pod
+After=pearls-network.service
+Requires=pearls-network.service
+
+[Pod]
+PublishPort=80:80
+PodmanArgs=--infra-name=pearls-infra
+Network=pearls.network
+
+[Install]
+WantedBy=multi-user.target default.target

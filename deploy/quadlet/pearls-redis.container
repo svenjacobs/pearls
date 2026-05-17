@@ -1,0 +1,19 @@
+[Unit]
+Description=Redis for Pearls
+After=pearls-pod.service
+PartOf=pearls-pod.service
+
+[Container]
+ContainerName=pearls-redis
+Image=docker.io/redis:8-alpine
+Pod=pearls.pod
+AutoUpdate=registry
+Volume=pearls-redis-data.volume:/data
+Volume=/etc/pearls/redis.conf:/usr/local/etc/redis/redis.conf:ro
+Exec=redis-server /usr/local/etc/redis/redis.conf
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target

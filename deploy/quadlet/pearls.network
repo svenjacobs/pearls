@@ -1,0 +1,8 @@
+[Unit]
+Description=Pearls network
+
+[Network]
+NetworkName=pearls
+
+[Install]
+WantedBy=default.target

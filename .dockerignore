@@ -1,0 +1,13 @@
+.agents
+.claude
+.git
+.github
+.zed
+.svelte-kit
+build
+node_modules
+.env
+Dockerfile
+compose.yaml
+compose.prod.yml
+*.md

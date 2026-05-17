@@ -1,0 +1,8 @@
+[Unit]
+Description=Persistent data volume for Pearls Redis
+
+[Volume]
+VolumeName=pearls-redis-data
+
+[Install]
+WantedBy=default.target
