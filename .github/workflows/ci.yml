@@ -11,7 +11,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: check
-    if: github.event.head_commit.author.name == 'release-please[bot]'
+    if: startsWith(github.event.head_commit.message, 'chore(main): release')
     permissions:
       contents: read
       packages: write
