@@ -73,15 +73,15 @@ docker pull ghcr.io/svenjacobs/pearls:latest
 If you prefer to build from source:
 
 ```bash
-podman build -t ghcr.io/svenjacobs/pearls:latest .
+podman build -t localhost/pearls:latest .
 # or
-docker build -t ghcr.io/svenjacobs/pearls:latest .
+docker build -t pearls:latest .
 ```
 
 > **Apple Silicon (ARM) Mac:** if your server runs x86-64 Linux, add `--platform linux/amd64` to build a compatible image:
 >
 > ```bash
-> podman build --platform linux/amd64 -t ghcr.io/svenjacobs/pearls:latest .
+> podman build --platform linux/amd64 -t localhost/pearls:latest .
 > ```
 
 The Dockerfile uses a multi-stage build:
@@ -95,7 +95,7 @@ If you built the image locally and don't have access to a container registry, ex
 
 ```bash
 # On your development machine — save and compress
-podman save ghcr.io/svenjacobs/pearls:latest | gzip > pearls.tar.gz
+podman save localhost/pearls:latest | gzip > pearls.tar.gz
 
 # Copy to server
 scp pearls.tar.gz user@server:/tmp/
