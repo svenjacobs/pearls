@@ -99,7 +99,7 @@ player goes.
 | Build tool         | Vite                                                             |
 | Code formatter     | [Prettier](https://prettier.io/) (with `prettier-plugin-svelte`) |
 | Database           | [Redis](https://redis.io/)                                       |
-| Utility library    | [es-toolkit](https://es-toolkit.slash.page/)                     |
+| Utility library    | [es-toolkit](https://es-toolkit.dev/)                            |
 
 ### Coding Conventions
 
@@ -124,8 +124,7 @@ player goes.
 - Keep game logic in `src/lib/` as pure TypeScript functions (no side effects) with accompanying unit tests.
 - Server-only code (DB access, secrets) must live under `src/lib/server/` to prevent accidental client exposure.
 - All code must be formatted with **Prettier** before committing. Run `pnpm format` to format, `pnpm lint` to verify.
-- After generating or modifying code that uses Tailwind classes, run `pnpx @tailwindcss/upgrade --force` to ensure all classes are valid and up to date.
-- **Tailwind canonical classes:** prefer canonical utility syntax over bracket notation whenever a plain-number value has a canonical equivalent. For example, write `z-9999` not `z-9999`, `duration-300` not `duration-300`. Bracket notation is still correct for values with units that have no canonical form (e.g. `w-[14%]`, `rounded-[18%]`). When a `px` value has a canonical Tailwind equivalent, use it (e.g. `text-[10px]` → `text-xs`); otherwise convert to `rem` to respect user font-size preferences.
+- **Tailwind canonical classes:** prefer canonical utility syntax over bracket notation whenever a plain-number value has a canonical equivalent. For example, write `z-9999` not `z-[9999]`, `duration-300` not `duration-[300ms]`. Bracket notation is still correct for values with units that have no canonical form (e.g. `w-[14%]`, `rounded-[18%]`). When a `px` value has a canonical Tailwind equivalent, use it (e.g. `text-[10px]` → `text-xs`); otherwise convert to `rem` to respect user font-size preferences.
 - **Numeric literals:** use underscores as thousands separators for any integer ≥ 1 000 (e.g. `1_000`, `4_000`, `1_047`, `86_400`). Applies to all TypeScript/JavaScript numeric literals; does not apply to numbers inside strings or HTML attributes.
 - **Prefer [es-toolkit](https://es-toolkit.dev/) over custom utilities.** Before writing any helper function, check the [es-toolkit reference](https://es-toolkit.dev/reference/array/at.html) first. Key areas already in use:
   - **Promise:** `delay(ms)` — never write `new Promise(r => setTimeout(r, ms))` inline.
@@ -200,7 +199,8 @@ instance in a container. Before running `pnpm test:integration`:
 
 ## Implementation Notes for AI Agents
 
-- Local agent skills are available in `.agents/skills/`.
+- Local agent skills are available in `.agents/skills/`. At session start, list and read all skills in that directory to understand what project-specific workflows are available.
+- **Dependency updates:** When the user asks to update, upgrade, check, verify, or look for outdated dependencies, read `.agents/skills/dependency-updates/SKILL.md` and follow it exactly before taking any action.
 - Game logic should live in `src/lib/` as pure TypeScript functions, well-typed and unit-tested.
 - The game board state per player is an array of 12 numbers (`number[12]`) where index `i` holds the pearl count for slot number `i + 1` (values 0–7). A zero means the slot is cleared.
 - The maximum number of pearls removable in a single turn depends on the dice roll.
