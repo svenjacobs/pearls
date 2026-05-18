@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/svenjacobs/pearls/compare/pearls-v1.0.1...pearls-v1.1.0) (2026-05-18)
+
+
+### Features
+
+* introduce max player name length limit ([#9](https://github.com/svenjacobs/pearls/issues/9)) ([c93f94e](https://github.com/svenjacobs/pearls/commit/c93f94e9345ad7e0fd8b432eb6a3253a2cc1c90f))
+
+
+### Bug Fixes
+
+* **push:** enforce https-only push subscription endpoints ([#12](https://github.com/svenjacobs/pearls/issues/12)) ([9c27497](https://github.com/svenjacobs/pearls/commit/9c274971562edc4f00595d1b6cf4d4042f3a69d9))
+
 ## [1.0.1](https://github.com/svenjacobs/pearls/compare/pearls-v1.0.0...pearls-v1.0.1) (2026-05-17)
 
 
