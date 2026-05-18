@@ -1,6 +1,6 @@
 <footer class="py-4 text-center text-xs text-gray-400 select-none dark:text-gray-600">
   Powered by <a
-    href="https://svenjacobs.com"
+    href="https://github.com/svenjacobs/pearls"
     target="_blank"
     rel="noopener noreferrer"
     class="text-amber-600 transition-colors hover:underline active:underline dark:text-amber-500"
