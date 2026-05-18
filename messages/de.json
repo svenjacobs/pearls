@@ -213,5 +213,10 @@
   "a11y_initiative_die_unrolled": "Noch nicht gewürfelt für {name}",
   "action_add_ai": "KI-Spieler hinzufügen",
   "action_remove_ai": "Entfernen",
-  "a11y_ai_player": "Das ist ein KI-Spieler"
+  "a11y_ai_player": "Das ist ein KI-Spieler",
+  "status_active_game": "Aktives Spiel",
+  "status_active_games": "Aktive Spiele",
+  "status_active_player": "Aktive Spieler:innen",
+  "status_active_players": "Aktive Spieler:innen",
+  "status_title": "Status"
 }

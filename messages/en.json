@@ -213,5 +213,10 @@
   "a11y_initiative_die_unrolled": "Unrolled die for {name}",
   "action_add_ai": "Add AI player",
   "action_remove_ai": "Remove",
-  "a11y_ai_player": "This is an AI player"
+  "a11y_ai_player": "This is an AI player",
+  "status_active_game": "Active Game",
+  "status_active_games": "Active Games",
+  "status_active_player": "Active Player",
+  "status_active_players": "Active Players",
+  "status_title": "Status"
 }

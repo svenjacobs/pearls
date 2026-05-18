@@ -4,6 +4,8 @@ export { playerRepository } from './player'
 export { pushSubscriptionRepository } from './push-subscription'
 export { reactionRepository } from './reaction'
 export { sessionRepository } from './session'
+export type { ServerStats } from './status'
+export { getStats } from './status'
 export { turnRepository } from './turn'
 export type {
   Die,
