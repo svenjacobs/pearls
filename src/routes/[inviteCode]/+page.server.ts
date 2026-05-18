@@ -4,8 +4,9 @@ import { error, redirect } from '@sveltejs/kit'
 import { resolve } from '$app/paths'
 import { MAX_PLAYERS, MIN_PLAYERS } from '$lib/server/game/constants'
 import { createInitiative } from '$lib/server/game/initiative'
+import { leaveGameSession } from '$lib/server/game/leave'
 import { computeScore } from '$lib/server/game/state'
-import { handlePlayerLeave, restartGame, startGameNow } from '$lib/server/game/turn-flow'
+import { restartGame, startGameNow } from '$lib/server/game/turn-flow'
 import { inviteUrl } from '$lib/server/invite'
 import { publishGameEvent } from '$lib/server/pubsub'
 import {
@@ -163,13 +164,10 @@ export const actions: Actions = {
     if (game) {
       const session = await findSessionForGame(cookies, game.id)
       if (session) {
-        if (game.status === 'playing') {
-          await handlePlayerLeave(game.id, session.playerId)
-        }
-        removeSession(cookies, session.id)
+        await leaveGameSession(cookies, session, game)
       }
     }
-    redirect(302, resolve('/games'))
+    redirect(302, resolve('/'))
   },
 
   abort: async ({ cookies, params }) => {
