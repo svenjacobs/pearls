@@ -4,7 +4,7 @@
 
 A self-hostable, turn-based multiplayer web implementation of a board game. Race to clear all 12 rows of pearls from your board before your opponents do. Full rules are explained in game.
 
-![Screenshots](./screenshot.png)
+![Screenshots](./screenshots.png)
 
 ## Features
 
