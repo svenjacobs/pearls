@@ -1,11 +1,11 @@
 import { error, redirect } from '@sveltejs/kit'
 
 import { resolve } from '$app/paths'
+import { leaveGameSession } from '$lib/server/game/leave'
 import { computeScore } from '$lib/server/game/state'
-import { handlePlayerLeave } from '$lib/server/game/turn-flow'
 import { gameRepository, playerRepository, sessionRepository } from '$lib/server/repository'
 import type { Game, GameSession, Player } from '$lib/server/repository/types'
-import { getAllSessionIds, removeSession } from '$lib/server/session/session'
+import { getAllSessionIds } from '$lib/server/session/session'
 
 import type { Actions, PageServerLoad } from './$types'
 
@@ -76,11 +76,8 @@ export const actions: Actions = {
     const session = await sessionRepository.findById(sessionId)
     if (session) {
       const game = await gameRepository.findById(session.gameId)
-      if (game?.status === 'playing') {
-        await handlePlayerLeave(game.id, session.playerId)
-      }
+      await leaveGameSession(cookies, session, game)
     }
-    removeSession(cookies, sessionId)
     redirect(302, resolve('/games'))
   },
 }
