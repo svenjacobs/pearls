@@ -137,6 +137,7 @@
   "error_network_end_turn": "Netzwerkfehler beim Beenden des Zuges",
   "error_name_taken": "Dieser Name ist in diesem Spiel bereits vergeben",
   "error_name_taken_suggestion": "Hier ist ein Vorschlag für dich:",
+  "error_name_too_long": "Name darf maximal 20 Zeichen lang sein",
   "a11y_dice_roller": "Würfelfeld",
   "a11y_active_dice": "Aktive Würfel",
   "a11y_spent_dice": "Eingesetzte Würfel",

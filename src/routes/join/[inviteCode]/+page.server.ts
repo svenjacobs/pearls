@@ -2,6 +2,7 @@ import { error, redirect } from '@sveltejs/kit'
 import { randomInt } from 'es-toolkit'
 
 import { resolve } from '$app/paths'
+import { MAX_NAME_LENGTH } from '$lib/playerName'
 import { MAX_PLAYERS } from '$lib/server/game/constants'
 import { inviteUrl } from '$lib/server/invite'
 import { gameRepository, playerRepository, sessionRepository } from '$lib/server/repository'
@@ -54,6 +55,7 @@ export const actions: Actions = {
     const pearlTheme = ((form.get('pearlTheme') as string | null) ?? '').trim()
 
     if (!name) return { error: 'name_required' as const }
+    if (name.length > MAX_NAME_LENGTH) return { error: 'name_too_long' as const }
 
     const game = await gameRepository.findByInviteCode(inviteCode)
     if (!game) return { error: 'not_found' as const }

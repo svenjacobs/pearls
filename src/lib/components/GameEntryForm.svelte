@@ -25,10 +25,21 @@
     suggestion?: string
     /** Pre-fills the name input (used to restore the value after a failed submission). */
     initialName?: string
+    /** Maximum number of characters allowed in the name input. */
+    maxNameLength?: number
   }
 
-  let { title, inviteCode, inviteUrl, buttonText, action, error, suggestion, initialName }: Props =
-    $props()
+  let {
+    title,
+    inviteCode,
+    inviteUrl,
+    buttonText,
+    action,
+    error,
+    suggestion,
+    initialName,
+    maxNameLength,
+  }: Props = $props()
 
   // svelte-ignore state_referenced_locally
   let nameValue = $state(initialName ?? '')
@@ -90,6 +101,7 @@
           type="text"
           placeholder={m.form_your_name_placeholder()}
           required
+          maxlength={maxNameLength}
           bind:value={nameValue}
           oninput={handleNameInput}
           class="w-full rounded-xl bg-gray-100 px-5 py-4 text-xl text-gray-900 placeholder-gray-400 transition-colors outline-none hover:bg-gray-200 focus:ring-2 focus:ring-amber-500 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 dark:hover:bg-gray-700

@@ -4,6 +4,7 @@
   import Footer from '$lib/components/Footer.svelte'
   import GameEntryForm from '$lib/components/GameEntryForm.svelte'
   import * as m from '$lib/paraglide/messages.js'
+  import { MAX_NAME_LENGTH } from '$lib/playerName'
 
   import type { ActionData, PageData } from './$types'
 
@@ -14,7 +15,13 @@
       ? (form as { error: 'name_taken'; enteredName: string; suggestion: string })
       : null,
   )
-  const formError = $derived(nameTakenData ? m.error_name_taken() : undefined)
+  const formError = $derived(
+    nameTakenData
+      ? m.error_name_taken()
+      : form?.error === 'name_too_long'
+        ? m.error_name_too_long()
+        : undefined,
+  )
   const formSuggestion = $derived(nameTakenData?.suggestion)
   const formInitialName = $derived(nameTakenData?.enteredName)
 </script>
@@ -54,6 +61,7 @@
       error={formError}
       suggestion={formSuggestion}
       initialName={formInitialName}
+      maxNameLength={MAX_NAME_LENGTH}
     />
   {/if}
   <Footer />
