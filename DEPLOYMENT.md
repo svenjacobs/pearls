@@ -21,14 +21,18 @@ Two deployment options are provided:
 
 Copy `deploy/.env.example` to `.env` and fill in real values before deploying.
 
-| Variable                  | Required                | Description                                                                               |
-| ------------------------- | ----------------------- | ----------------------------------------------------------------------------------------- |
-| `REDIS_URL`               | Yes                     | Redis connection string, e.g. `redis://localhost:6379`                                    |
-| `BASE_URL`                | Yes                     | Public URL of the application, e.g. `https://pearls.example.com`                          |
-| `ORIGIN`                  | Yes                     | Must match `BASE_URL`. Required by SvelteKit's adapter-node for CSRF protection.          |
-| `PORT`                    | No                      | Port the Node server binds to. Defaults to `3000`.                                        |
-| `CLEANUP_SECRET`          | Yes (to enable cleanup) | Bearer token for the `/api/admin/cleanup` endpoint. Generate with `openssl rand -hex 32`. |
-| `CLEANUP_STALE_GAME_DAYS` | No                      | Days without activity before a game is purged. Default: `7`.                              |
+| Variable                  | Required                | Description                                                                                                                                                       |
+| ------------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `REDIS_URL`               | Yes                     | Redis connection string, e.g. `redis://localhost:6379`                                                                                                            |
+| `ORIGIN`                  | Yes                     | Public URL of the application (scheme + host + optional subpath), e.g. `https://pearls.example.com`. Required by SvelteKit's adapter-node for CSRF protection and used to construct invite links. If the app is served at a subpath, include it: `https://example.com/pearls`. |
+| `PORT`                    | No                      | Port the Node server binds to. Defaults to `3000`.                                                                                                                |
+| `VAPID_PUBLIC_KEY`        | No                      | VAPID public key for Web Push notifications. If all three VAPID variables are set, the server sends push notifications when it is a player's turn or the game ends. Generate with `node -e "const wp = require('web-push'); console.log(JSON.stringify(wp.generateVAPIDKeys(), null, 2))"`. |
+| `VAPID_PRIVATE_KEY`       | No                      | VAPID private key for Web Push notifications.                                                                                                                     |
+| `VAPID_SUBJECT`           | No                      | VAPID subject — a `mailto:` address or the canonical HTTPS URL of the application. Identifies the server to push services.                                        |
+| `PUSH_INACTIVITY_SECONDS` | No                      | Seconds of SSE inactivity before a player is eligible to receive push notifications. Defaults to `300` (5 minutes).                                               |
+| `CLEANUP_SECRET`          | Yes (to enable cleanup) | Bearer token for the `/api/admin/cleanup` endpoint. Generate with `openssl rand -hex 32`.                                                                         |
+| `CLEANUP_STALE_GAME_DAYS` | No                      | Days without activity before a game is purged. Default: `7`.                                                                                                     |
+| `LOG_FILE`                | No                      | Path to the server log file (absolute or relative to the process working directory). Defaults to `logs/app.log`.                                                  |
 
 > **Note:** In the Compose deployment `REDIS_URL` is overridden automatically in `deploy/compose.yml` to use the `redis` service name. In the Quadlet pod deployment all containers share a network namespace so `redis://localhost:6379` is correct.
 
