@@ -5,7 +5,7 @@ PartOf=pearls-pod.service
 
 [Container]
 ContainerName=pearls-app
-Image=localhost/pearls:latest
+Image=ghcr.io/svenjacobs/pearls:latest
 Pod=pearls.pod
 EnvironmentFile=/etc/pearls/pearls.env
 Volume=/var/log/pearls:/var/log/pearls:z

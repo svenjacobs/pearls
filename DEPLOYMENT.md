@@ -10,10 +10,10 @@ Internet → nginx (port 80/443) → pearls app (port 3000) → Redis (port 6379
 
 Two deployment options are provided:
 
-| Option             | File(s)            | Use case                                  |
-| ------------------ | ------------------ | ----------------------------------------- |
-| **Compose**        | `compose.prod.yml` | Local production test, simple single-host |
-| **Podman Quadlet** | `deploy/quadlet/`  | Systemd-managed production server         |
+| Option             | File(s)              | Use case                                  |
+| ------------------ | -------------------- | ----------------------------------------- |
+| **Compose**        | `deploy/compose.yml` | Local production test, simple single-host |
+| **Podman Quadlet** | `deploy/quadlet/`    | Systemd-managed production server         |
 
 ---
 
@@ -30,7 +30,7 @@ Copy `deploy/.env.example` to `.env` and fill in real values before deploying.
 | `CLEANUP_SECRET`          | Yes (to enable cleanup) | Bearer token for the `/api/admin/cleanup` endpoint. Generate with `openssl rand -hex 32`. |
 | `CLEANUP_STALE_GAME_DAYS` | No                      | Days without activity before a game is purged. Default: `7`.                              |
 
-> **Note:** In the Compose deployment `REDIS_URL` is overridden automatically in `compose.prod.yml` to use the `redis` service name. In the Quadlet pod deployment all containers share a network namespace so `redis://localhost:6379` is correct.
+> **Note:** In the Compose deployment `REDIS_URL` is overridden automatically in `deploy/compose.yml` to use the `redis` service name. In the Quadlet pod deployment all containers share a network namespace so `redis://localhost:6379` is correct.
 
 ### Optional: Redis password
 
@@ -56,18 +56,30 @@ systemctl --user restart pearls-redis.service pearls-app.service
 
 ---
 
-## Building the image
+## Getting the image
+
+### Pull from registry (recommended)
+
+Pre-built multi-arch images (amd64 + arm64) are published to the GitHub Container Registry on every release:
 
 ```bash
-podman build -t localhost/pearls:latest .
+podman pull ghcr.io/svenjacobs/pearls:latest
 # or
-docker build -t pearls:latest .
+docker pull ghcr.io/svenjacobs/pearls:latest
+```
+
+### Building the image yourself
+
+```bash
+podman build -t ghcr.io/svenjacobs/pearls:latest .
+# or
+docker build -t ghcr.io/svenjacobs/pearls:latest .
 ```
 
 > **Apple Silicon (ARM) Mac:** if your server runs x86-64 Linux, add `--platform linux/amd64` to build a compatible image:
 >
 > ```bash
-> podman build --platform linux/amd64 -t localhost/pearls:latest .
+> podman build --platform linux/amd64 -t ghcr.io/svenjacobs/pearls:latest .
 > ```
 
 The Dockerfile uses a multi-stage build:
@@ -75,15 +87,13 @@ The Dockerfile uses a multi-stage build:
 1. **Builder** — installs all dependencies with pnpm and runs `pnpm build`
 2. **Production** — copies only the compiled `build/` output (Vite bundles all runtime dependencies at build time; no `node_modules` needed in the final image)
 
----
+### Transferring a locally built image to a remote server
 
-## Transferring the image to a remote server
-
-If you don't have a container registry, export the image and copy it directly:
+If you built the image locally and don't have a container registry, export and copy it directly:
 
 ```bash
 # On your development machine — save and compress
-podman save localhost/pearls:latest | gzip > pearls.tar.gz
+podman save ghcr.io/svenjacobs/pearls:latest | gzip > pearls.tar.gz
 
 # Copy to server
 scp pearls.tar.gz user@server:/tmp/
@@ -92,19 +102,17 @@ scp pearls.tar.gz user@server:/tmp/
 podman load < /tmp/pearls.tar.gz
 ```
 
-After loading, the image is available as `localhost/pearls:latest` on the server and can be used by the Quadlet units without modification.
-
 ---
 
 ## Option 1: Compose (local production test)
 
-Uses `compose.prod.yml`, which starts nginx, the app, and Redis on a shared bridge network. nginx binds to host port **8080** (to avoid requiring root).
+Uses `deploy/compose.yml`, which starts nginx, the app, and Redis on a shared bridge network. nginx binds to host port **8080** (to avoid requiring root).
 
 ```bash
-# Start (builds the app image automatically)
-podman compose -f compose.prod.yml up --build
+# Start (pulls ghcr.io/svenjacobs/pearls:latest automatically)
+podman compose -f deploy/compose.yml up
 # or
-docker compose -f compose.prod.yml up --build
+docker compose -f deploy/compose.yml up
 
 # Verify
 curl http://localhost:8080/
@@ -114,7 +122,7 @@ curl -N http://localhost:8080/api/game/events   # SSE stream, should stay open
 To stop:
 
 ```bash
-podman compose -f compose.prod.yml down
+podman compose -f deploy/compose.yml down
 ```
 
 ---
@@ -156,10 +164,10 @@ The pod publishes **port 80** to the host. Modify `pearls.pod` to also publish 4
 
 ### Step-by-step setup
 
-**1. Build the application image**
+**1. Pull the application image**
 
 ```bash
-podman build -t localhost/pearls:latest .
+podman pull ghcr.io/svenjacobs/pearls:latest
 ```
 
 **2. Copy Quadlet unit files**
@@ -226,15 +234,15 @@ systemctl --user restart pearls-app.service
 # Stop everything
 systemctl --user stop pearls-pod.service
 
-# Rebuild and redeploy
-podman build -t localhost/pearls:latest .
+# Update and redeploy
+podman pull ghcr.io/svenjacobs/pearls:latest
 systemctl --user restart pearls-app.service
 ```
 
 ### Updating the application
 
 ```bash
-podman build -t localhost/pearls:latest .
+podman pull ghcr.io/svenjacobs/pearls:latest
 systemctl --user restart pearls-app.service
 ```
 
@@ -255,9 +263,9 @@ A minimal Alpine container runs `crond` and calls the endpoint daily at 03:00. T
 
 ### Compose
 
-The cleanup container is included in `compose.prod.yml` as the `cleanup` service. It reads `CLEANUP_SECRET` from `.env` and calls the app at `http://app:3000`.
+The cleanup container is included in `deploy/compose.yml` as the `cleanup` service. It reads `CLEANUP_SECRET` from `.env` and calls the app at `http://app:3000`.
 
-No extra setup needed — it starts automatically with `docker compose -f compose.prod.yml up`.
+No extra setup needed — it starts automatically with `docker compose -f deploy/compose.yml up`.
 
 ### Quadlet
 
