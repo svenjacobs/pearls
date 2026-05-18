@@ -17,3 +17,6 @@ bun.lockb
 
 # Generated changelog (release please)
 CHANGELOG.md
+
+# AI instructions
+AGENTS.md
