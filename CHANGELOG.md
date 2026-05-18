@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/svenjacobs/pearls/compare/pearls-v1.1.0...pearls-v1.1.1) (2026-05-18)
+
+
+### Bug Fixes
+
+* **game:** navigate to / on leave, extract leaveGameSession helper ([#16](https://github.com/svenjacobs/pearls/issues/16)) ([0e3f2d4](https://github.com/svenjacobs/pearls/commit/0e3f2d41ac3da42d2b6dcc115da81e858c8b2066))
+
 ## [1.1.0](https://github.com/svenjacobs/pearls/compare/pearls-v1.0.1...pearls-v1.1.0) (2026-05-18)
 
 
