@@ -179,6 +179,7 @@ export const actions: Actions = {
         if (game.playerIds.length <= 1) {
           await initiativeRepository.delete(game.id)
           await gameRepository.delete(game)
+          await publishGameEvent(game.id, { event: 'refresh' })
         } else {
           await gameRepository.removePlayer(game.id, session.playerId)
           const remainingIds = game.playerIds.filter((id) => id !== session.playerId)
