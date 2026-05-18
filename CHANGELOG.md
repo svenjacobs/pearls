@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/svenjacobs/pearls/compare/pearls-v1.1.1...pearls-v1.2.0) (2026-05-18)
+
+
+### Features
+
+* **status:** add live status page with animated stats ([#18](https://github.com/svenjacobs/pearls/issues/18)) ([c5f2318](https://github.com/svenjacobs/pearls/commit/c5f231847f2a4588402d5f2d228d3fe4f4edbd23))
+
 ## [1.1.1](https://github.com/svenjacobs/pearls/compare/pearls-v1.1.0...pearls-v1.1.1) (2026-05-18)
 
 
