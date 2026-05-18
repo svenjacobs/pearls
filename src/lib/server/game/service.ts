@@ -7,6 +7,7 @@
 
 import { delay } from 'es-toolkit'
 
+import { hasTripleRoll, triggerAiReactions } from '$lib/server/ai/reactions'
 import {
   advanceRound,
   applyRoll,
@@ -14,7 +15,6 @@ import {
   isRoundComplete,
   isTied,
 } from '$lib/server/game/initiative'
-import { hasTripleRoll, triggerAiReactions } from '$lib/server/ai/reactions'
 import {
   canFormAnyTarget,
   canFormTarget,

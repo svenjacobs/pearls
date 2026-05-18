@@ -66,12 +66,12 @@
     aria-hidden="true"
   >
     <div
-      class="flex items-center gap-2 rounded-md bg-black/65 px-4 py-2 font-mono text-sm tracking-wider text-white backdrop-blur-sm md:text-base"
+      class="flex max-w-xs min-w-40 items-center gap-2 rounded-md bg-black/65 px-4 py-2 font-mono text-sm tracking-wider text-white backdrop-blur-sm md:text-base"
     >
       <span
         class="block size-2 shrink-0 animate-pulse rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.9)]"
       ></span>
-      <span class="uppercase">{m.spectator_watching({ name: playerName })}</span>
+      <span class="min-w-0 truncate uppercase">{m.spectator_watching({ name: playerName })}</span>
     </div>
   </div>
 {/if}
