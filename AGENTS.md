@@ -10,6 +10,8 @@ and **[TailwindCSS](https://tailwindcss.com/)**.
 - **Runtime platform:** Node.js 26.
 - **Dependency placement:** All packages go in `devDependencies` (`pnpm add -D`). SvelteKit/Vite bundles everything at build time, so `dependencies` is not needed unless a package explicitly cannot be bundled (e.g. native `.node` addons).
 - **Commit and PR titles:** must follow the [Conventional Commits specification](https://www.conventionalcommits.org/en/v1.0.0/#specification) (e.g. `feat(game): add pearl theme picker`, `fix(score): correct score calculation`, `feat(ai): improve bot difficulty`, `chore(deps): update dependencies`, `refactor(sse): simplify reconnect logic`).
+- **Pull requests:** when creating a PR, apply appropriate labels — `bug`, `enhancement`, `documentation`, `refactor`, `chore`, `test`, etc. — matching the type of change.
+- **Branching:** never commit directly to `main` unless explicitly instructed. Always create a branch for any change. Branch names must use a Conventional Commits-style prefix: `feat/`, `fix/`, `chore/`, `docs/`, `refactor/`, `test/`, etc. (e.g. `feat/push-notifications`, `fix/score-calculation`, `docs/deployment-guide`).
 
 ---
 
