@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/svenjacobs/pearls/compare/pearls-v1.2.0...pearls-v1.2.1) (2026-05-19)
+
+
+### Bug Fixes
+
+* **cleanup:** publish refresh event after deleting stale games ([#20](https://github.com/svenjacobs/pearls/issues/20)) ([b3883e3](https://github.com/svenjacobs/pearls/commit/b3883e37b60338788cee4053ffad3edaa8e8389d))
+
 ## [1.2.0](https://github.com/svenjacobs/pearls/compare/pearls-v1.1.1...pearls-v1.2.0) (2026-05-18)
 
 
