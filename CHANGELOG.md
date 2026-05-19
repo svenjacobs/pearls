@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.3.0](https://github.com/svenjacobs/pearls/compare/pearls-v1.2.1...pearls-v1.3.0) (2026-05-19)
+
+
+### Features
+
+* **ai:** prefer row with most clearable pearls within priority tier ([#23](https://github.com/svenjacobs/pearls/issues/23)) ([674e59f](https://github.com/svenjacobs/pearls/commit/674e59fabf366110d29461a71ec714f3b5c03673))
+
+
+### Bug Fixes
+
+* **demo:** use addSession to fix watch AI game 404 ([#25](https://github.com/svenjacobs/pearls/issues/25)) ([85d90b6](https://github.com/svenjacobs/pearls/commit/85d90b6ea79efb0fa5dfc07fad31cd39451b942f))
+
 ## [1.2.1](https://github.com/svenjacobs/pearls/compare/pearls-v1.2.0...pearls-v1.2.1) (2026-05-19)
 
 
