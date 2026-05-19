@@ -1,5 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
 
+const mockPublishGameEvent = vi.fn().mockResolvedValue(undefined)
+
+vi.mock('$lib/server/pubsub', () => ({
+  publishGameEvent: mockPublishGameEvent,
+}))
+
 vi.mock('$lib/server/repository/cleanup', () => ({
   cleanupRepository: {
     deleteStaleGames: vi.fn().mockResolvedValue({ deleted: 3, errors: 0 }),
@@ -57,6 +63,34 @@ describe('POST /api/admin/cleanup', () => {
       sessions: { deleted: 1, errors: 0 },
     })
     expect(typeof body.durationMs).toBe('number')
+    vi.resetModules()
+  })
+
+  it('publishes refresh event when games are deleted', async () => {
+    vi.doMock('$env/dynamic/private', () => ({
+      env: { CLEANUP_SECRET: 'secret', CLEANUP_STALE_GAME_DAYS: '7' },
+    }))
+    mockPublishGameEvent.mockClear()
+    const { POST } = await import('./+server')
+    await POST({ request: makeRequest('secret') } as never)
+    expect(mockPublishGameEvent).toHaveBeenCalledWith('cleanup', { event: 'refresh' })
+    vi.resetModules()
+  })
+
+  it('does not publish event when no games are deleted', async () => {
+    vi.doMock('$env/dynamic/private', () => ({
+      env: { CLEANUP_SECRET: 'secret', CLEANUP_STALE_GAME_DAYS: '7' },
+    }))
+    vi.doMock('$lib/server/repository/cleanup', () => ({
+      cleanupRepository: {
+        deleteStaleGames: vi.fn().mockResolvedValue({ deleted: 0, errors: 0 }),
+        deleteOrphanedSessions: vi.fn().mockResolvedValue({ deleted: 0, errors: 0 }),
+      },
+    }))
+    mockPublishGameEvent.mockClear()
+    const { POST } = await import('./+server')
+    await POST({ request: makeRequest('secret') } as never)
+    expect(mockPublishGameEvent).not.toHaveBeenCalled()
     vi.resetModules()
   })
 })

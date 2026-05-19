@@ -2,6 +2,7 @@ import { json } from '@sveltejs/kit'
 
 import { env } from '$env/dynamic/private'
 import { logger } from '$lib/server/logger'
+import { publishGameEvent } from '$lib/server/pubsub'
 import { cleanupRepository } from '$lib/server/repository/cleanup'
 
 import type { RequestHandler } from './$types'
@@ -33,5 +34,13 @@ export const POST: RequestHandler = async ({ request }) => {
 
   const durationMs = Date.now() - start
   logger.info({ games, sessions, durationMs }, 'Cleanup completed')
+
+  if (games.deleted > 0) {
+    // Notify status SSE clients that active game counts have changed. The game
+    // ID is a synthetic sentinel — the global hook ignores it and notifies all
+    // connected status listeners.
+    await publishGameEvent('cleanup', { event: 'refresh' })
+  }
+
   return json({ games, sessions, durationMs })
 }
