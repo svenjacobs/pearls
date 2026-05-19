@@ -8,7 +8,7 @@ import { MAX_PLAYERS, MIN_PLAYERS } from '$lib/server/game/constants'
 import { startGameNow } from '$lib/server/game/turn-flow'
 import { publishGameEvent } from '$lib/server/pubsub'
 import { gameRepository, playerRepository, sessionRepository } from '$lib/server/repository'
-import { setSessionId } from '$lib/server/session/session'
+import { addSession } from '$lib/server/session/session'
 
 import type { Actions, PageServerLoad } from './$types'
 
@@ -49,7 +49,7 @@ export const actions: Actions = {
     // game page resolves a valid session and shows the spectator view.
     const observer = await playerRepository.create('Observer')
     const session = await sessionRepository.create(game.id, observer.id)
-    setSessionId(cookies, session.id)
+    addSession(cookies, session.id)
 
     // Start immediately — no initiative dice-off needed for a pure AI game.
     const freshGame = await gameRepository.findById(game.id)
