@@ -6,6 +6,8 @@ A self-hostable, turn-based multiplayer web implementation of a board game. Race
 
 ![Screenshots](./screenshots.png)
 
+Demo at [pearls.svenjacobs.com](https://pearls.svenjacobs.com).
+
 ## Features
 
 - **Real-time multiplayer** — up to several players per game, board states update live via Server-Sent Events
