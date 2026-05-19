@@ -81,7 +81,7 @@ const runAiTurn = async (gameId: string, playerId: string): Promise<void> => {
       } else {
         const targets = reachableTargets(turn.dice, board)
         if (targets.size === 0) return
-        target = chooseTarget(targets, board, staged)
+        target = chooseTarget(targets, board, staged, turn.dice)
       }
 
       const dieIndices = chooseDiceForTarget(turn.dice, target)

@@ -23,32 +23,45 @@ describe('rowPriority', () => {
 describe('chooseTarget', () => {
   const board = Array(12).fill(7)
   const staged = Array(12).fill(0)
+  const noDice: Die[] = []
 
   it('prefers row 12 over row 7 over row 3', () => {
     const reachable = new Set([3, 7, 12])
-    expect(chooseTarget(reachable, board, staged)).toBe(12)
+    expect(chooseTarget(reachable, board, staged, noDice)).toBe(12)
   })
 
   it('prefers row 11 over row 10', () => {
     const reachable = new Set([10, 11])
-    expect(chooseTarget(reachable, board, staged)).toBe(11)
+    expect(chooseTarget(reachable, board, staged, noDice)).toBe(11)
   })
 
-  it('within same priority tier prefers the row with fewer pearls left', () => {
+  it('within same priority tier prefers the row where most pearls can be cleared this roll', () => {
     const b = Array(12).fill(7)
-    b[10] = 2 // row 11 has 2 pearls (easier to clear)
+    b[10] = 5 // row 11 has 5 pearls
     b[11] = 5 // row 12 has 5 pearls
+    // [6,6,6,5,6]: row 12 gets (6+6),(6+6) = 2 pairs; row 11 gets only (6+5) = 1 pair
+    const dice: Die[] = [active(6), active(6), active(6), active(5), active(6)]
     const reachable = new Set([11, 12])
-    // both priority 3; row 11 has fewer → choose 11
-    expect(chooseTarget(reachable, b, staged)).toBe(11)
+    expect(chooseTarget(reachable, b, staged, dice)).toBe(12)
   })
 
-  it('within row 1–6 tier prefers row with fewest pearls', () => {
+  it('within row 1–6 tier prefers row where most pearls can be cleared this roll', () => {
     const b = Array(12).fill(7)
-    b[2] = 1 // row 3 has 1 pearl
-    b[5] = 3 // row 6 has 3 pearls
+    // dice: three 3s and one 6 → row 3 clears 3, row 6 clears 1
+    const dice: Die[] = [active(3), active(3), active(3), active(6)]
     const reachable = new Set([3, 6])
-    expect(chooseTarget(reachable, b, staged)).toBe(3)
+    expect(chooseTarget(reachable, b, staged, dice)).toBe(3)
+  })
+
+  it('prefers most clearable even when the other row has fewer pearls remaining', () => {
+    // row 1: 1 pearl left, roll has one 1 → clears 1
+    // row 4: 7 pearls left, roll has three 4s → clears 3
+    // same priority tier (1–6); should prefer row 4 despite row 1 being nearly done
+    const b = Array(12).fill(7)
+    b[0] = 1 // row 1 has 1 pearl
+    const dice: Die[] = [active(1), active(4), active(4), active(4), active(3), active(2)]
+    const reachable = new Set([1, 4])
+    expect(chooseTarget(reachable, b, staged, dice)).toBe(4)
   })
 })
 

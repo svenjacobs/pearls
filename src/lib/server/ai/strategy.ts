@@ -6,8 +6,8 @@
  *   2 — rows 7–10  (paired sums, moderate difficulty)
  *   1 — rows 1–6   (single die; all equally easy)
  *
- * Within the same tier: prefer the row with fewest pearls remaining
- * (clear it sooner to gain the bonus fresh-turn).
+ * Within the same tier: prefer the row where the most pearls can be cleared
+ * this roll (maximise progress per turn).
  */
 
 import type { Die } from '$lib/server/repository/types'
@@ -18,16 +18,26 @@ export const rowPriority = (row: number): number => {
   return 1
 }
 
+const clearableThisRoll = (dice: Die[], target: number, remaining: number): number => {
+  const combos = chooseDiceForTarget(dice, target).length / (target <= 6 ? 1 : 2)
+  return Math.min(combos, remaining)
+}
+
 /**
  * Choose the best target from the set of reachable targets given the board
  * state (effective remaining pearls = board − staged).
  */
-export const chooseTarget = (reachable: Set<number>, board: number[], staged: number[]): number => {
+export const chooseTarget = (
+  reachable: Set<number>,
+  board: number[],
+  staged: number[],
+  dice: Die[],
+): number => {
   const effective = board.map((count, i) => Math.max(0, count - (staged[i] ?? 0)))
   const sorted = [...reachable].sort((a, b) => {
     const priDiff = rowPriority(b) - rowPriority(a)
     if (priDiff !== 0) return priDiff
-    return (effective[a - 1] ?? 7) - (effective[b - 1] ?? 7)
+    return clearableThisRoll(dice, b, effective[b - 1] ?? 7) - clearableThisRoll(dice, a, effective[a - 1] ?? 7)
   })
   return sorted[0]!
 }
