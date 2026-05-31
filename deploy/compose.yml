@@ -48,7 +48,7 @@ services:
     depends_on:
       - app
     command: >
-      sh -c "printf 'CLEANUP_SECRET=%s\nCLEANUP_URL=%s\n' \"$$CLEANUP_SECRET\" \"$$CLEANUP_URL\" > /etc/environment && crond -f -l 2"
+      sh -c "printf 'CLEANUP_SECRET=%s\nCLEANUP_URL=%s\n' \"$$CLEANUP_SECRET\" \"$$CLEANUP_URL\" > /etc/environment && apk add -q --no-cache curl && crond -f -l 2"
 
 volumes:
   redis-data:
