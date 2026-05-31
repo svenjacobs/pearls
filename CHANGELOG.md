@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/svenjacobs/pearls/compare/pearls-v1.3.0...pearls-v1.3.1) (2026-05-31)
+
+
+### Bug Fixes
+
+* **deploy:** install curl in Compose cleanup container before starting crond ([#27](https://github.com/svenjacobs/pearls/issues/27)) ([8ee3bcc](https://github.com/svenjacobs/pearls/commit/8ee3bcca222be0eb8869e341af3405e6094cbf0d))
+
 ## [1.3.0](https://github.com/svenjacobs/pearls/compare/pearls-v1.2.1...pearls-v1.3.0) (2026-05-19)
 
 
