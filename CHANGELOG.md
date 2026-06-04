@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/svenjacobs/pearls/compare/pearls-v1.4.0...pearls-v1.4.1) (2026-06-04)
+
+
+### Bug Fixes
+
+* **push:** use cross-browser base64url decode for VAPID key ([#33](https://github.com/svenjacobs/pearls/issues/33)) ([3ddcb28](https://github.com/svenjacobs/pearls/commit/3ddcb285b919bab179825f23d23925a14e574817))
+
 ## [1.4.0](https://github.com/svenjacobs/pearls/compare/pearls-v1.3.1...pearls-v1.4.0) (2026-06-04)
 
 
