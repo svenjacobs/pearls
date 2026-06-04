@@ -11,6 +11,7 @@ const KEYS = {
   theme: 'pearls:theme',
   reactions: 'pearls:reactions',
   pearlTheme: 'pearls:pearlTheme',
+  installPromptDismissed: 'pearls:installPromptDismissed',
 } as const
 
 const read = (key: string): string | null => {
@@ -78,3 +79,9 @@ export const setReactionsEnabled = (enabled: boolean): void =>
 
 export const getPearlTheme = (): string | null => read(KEYS.pearlTheme)
 export const setPearlTheme = (id: string): void => write(KEYS.pearlTheme, id)
+
+// ── Install prompt ──────────────────────────────────────────────────────────────
+
+/** Whether the user dismissed the "install this app" info box ("don't show again"). */
+export const getInstallPromptDismissed = (): boolean => read(KEYS.installPromptDismissed) === '1'
+export const setInstallPromptDismissed = (): void => write(KEYS.installPromptDismissed, '1')

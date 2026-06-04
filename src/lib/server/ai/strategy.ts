@@ -37,7 +37,10 @@ export const chooseTarget = (
   const sorted = [...reachable].sort((a, b) => {
     const priDiff = rowPriority(b) - rowPriority(a)
     if (priDiff !== 0) return priDiff
-    return clearableThisRoll(dice, b, effective[b - 1] ?? 7) - clearableThisRoll(dice, a, effective[a - 1] ?? 7)
+    return (
+      clearableThisRoll(dice, b, effective[b - 1] ?? 7) -
+      clearableThisRoll(dice, a, effective[a - 1] ?? 7)
+    )
   })
   return sorted[0]!
 }
