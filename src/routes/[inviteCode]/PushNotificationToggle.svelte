@@ -1,6 +1,7 @@
 <script lang="ts">
   import { browser } from '$app/environment'
   import { page } from '$app/stores'
+  import { urlBase64ToUint8Array } from '$lib/base64'
   import { notification } from '$lib/notification.svelte'
   import * as m from '$lib/paraglide/messages.js'
 
@@ -82,7 +83,7 @@
       const reg = await getActiveRegistration()
       const sub = await reg.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: Uint8Array.fromBase64(vapidPublicKey, { alphabet: 'base64url' }),
+        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
       })
       const res = await fetch('/api/push/subscribe', {
         method: 'POST',
