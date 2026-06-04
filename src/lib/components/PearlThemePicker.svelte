@@ -12,7 +12,7 @@
     type PearlTheme,
     THEME_GROUPS,
     type ThemeGroup,
-  } from '$lib/pearlThemes'
+  } from '$lib/pearl-themes'
   import { getPearlTheme, setPearlTheme } from '$lib/storage'
 
   let selected = $state(DEFAULT_THEME_ID)

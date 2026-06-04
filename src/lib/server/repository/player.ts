@@ -1,7 +1,7 @@
 import { createId } from '@paralleldrive/cuid2'
 import { sample } from 'es-toolkit'
 
-import { PEARL_THEMES } from '$lib/pearlThemes'
+import { PEARL_THEMES } from '$lib/pearl-themes'
 import { redis } from '$lib/server/redis'
 
 import type { Player } from './types'

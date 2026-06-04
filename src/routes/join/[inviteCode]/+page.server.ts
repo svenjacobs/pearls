@@ -2,7 +2,7 @@ import { error, redirect } from '@sveltejs/kit'
 import { randomInt } from 'es-toolkit'
 
 import { resolve } from '$app/paths'
-import { MAX_NAME_LENGTH } from '$lib/playerName'
+import { MAX_NAME_LENGTH } from '$lib/player-name'
 import { MAX_PLAYERS } from '$lib/server/game/constants'
 import { inviteUrl } from '$lib/server/invite'
 import { gameRepository, playerRepository, sessionRepository } from '$lib/server/repository'
