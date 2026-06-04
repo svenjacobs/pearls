@@ -23,8 +23,8 @@
   import ThemeSwitch from '$lib/components/ThemeSwitch.svelte'
   import { notification } from '$lib/notification.svelte'
   import * as m from '$lib/paraglide/messages.js'
-  import { getThemeColors } from '$lib/pearlThemes'
-  import { playerDisplayName } from '$lib/playerName'
+  import { getThemeColors } from '$lib/pearl-themes'
+  import { playerDisplayName } from '$lib/player-name'
   import { connectSse } from '$lib/sse'
   import { getReactionsEnabled, setReactionsEnabled } from '$lib/storage'
 

@@ -4,7 +4,7 @@
   import Footer from '$lib/components/Footer.svelte'
   import GameEntryForm from '$lib/components/GameEntryForm.svelte'
   import * as m from '$lib/paraglide/messages.js'
-  import { MAX_NAME_LENGTH } from '$lib/playerName'
+  import { MAX_NAME_LENGTH } from '$lib/player-name'
 
   import type { ActionData, PageData } from './$types'
 

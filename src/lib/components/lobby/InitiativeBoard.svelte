@@ -10,7 +10,7 @@
   import Die from '$lib/components/game_assets/dice/Die.svelte'
   import { notification } from '$lib/notification.svelte'
   import * as m from '$lib/paraglide/messages'
-  import { playerDisplayName } from '$lib/playerName'
+  import { playerDisplayName } from '$lib/player-name'
   import type { GameInitiative } from '$lib/server/repository/types'
   import type { Player } from '$lib/server/repository/types'
 

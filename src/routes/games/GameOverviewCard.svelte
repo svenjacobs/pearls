@@ -12,7 +12,7 @@
   import LeaveGameButton from '$lib/components/LeaveGameButton.svelte'
   import { formatDuration } from '$lib/duration'
   import * as m from '$lib/paraglide/messages.js'
-  import { getThemeColors } from '$lib/pearlThemes'
+  import { getThemeColors } from '$lib/pearl-themes'
 
   import type { ActiveGameEntry } from './+page.server'
 

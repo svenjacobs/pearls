@@ -134,6 +134,12 @@ player goes.
   - **Object:** `pick`, `omit`, `mapValues`, etc.
     Only write a custom utility when es-toolkit genuinely does not cover the need.
 
+### File Naming
+
+- **Plain TypeScript files** (`.ts`): kebab-case — e.g. `pearl-themes.ts`, `player-name.ts`. Never camelCase (`pearlThemes.ts`) or PascalCase.
+- **Svelte components** (`.svelte`): PascalCase — e.g. `PearlThemePicker.svelte`. This is the Svelte community convention and is not affected by the rule above.
+- **SvelteKit reserved files** (`+page.svelte`, `+layout.server.ts`, `hooks.server.ts`, etc.) and framework barrel exports (`index.ts`) follow framework conventions and are exempt.
+
 ### Responsive Design
 
 All components and HTML must be **fully responsive** — they must work well on small

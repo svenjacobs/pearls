@@ -2,7 +2,7 @@ import { redirect } from '@sveltejs/kit'
 
 import { resolve } from '$app/paths'
 import { generateInviteCode } from '$lib'
-import { MAX_NAME_LENGTH } from '$lib/playerName'
+import { MAX_NAME_LENGTH } from '$lib/player-name'
 import { inviteUrl } from '$lib/server/invite'
 
 import type { Actions, PageServerLoad } from './$types'

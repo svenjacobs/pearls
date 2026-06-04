@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { DEFAULT_THEME_ID, getThemeColors, PEARL_THEMES } from './pearlThemes'
+import { DEFAULT_THEME_ID, getThemeColors, PEARL_THEMES } from './pearl-themes'
 
 describe('PEARL_THEMES', () => {
   it('every theme has exactly 12 colors', () => {
