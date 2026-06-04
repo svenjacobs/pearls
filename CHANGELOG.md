@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/svenjacobs/pearls/compare/pearls-v1.3.1...pearls-v1.4.0) (2026-06-04)
+
+
+### Features
+
+* **pwa:** add install prompt banner to start route ([#29](https://github.com/svenjacobs/pearls/issues/29)) ([dec1b11](https://github.com/svenjacobs/pearls/commit/dec1b11a2a6cd528b88572ba8cd0d78c8cad0c88))
+
 ## [1.3.1](https://github.com/svenjacobs/pearls/compare/pearls-v1.3.0...pearls-v1.3.1) (2026-05-31)
 
 
