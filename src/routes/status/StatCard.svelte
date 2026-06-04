@@ -4,11 +4,11 @@
 
   let { value, label }: { value: number; label: string } = $props()
 
-  let direction = 1
-  let lastValue = value
+  let direction = $state(1)
+  let lastValue = $state<number | undefined>(undefined)
 
   $effect.pre(() => {
-    direction = value >= lastValue ? 1 : -1
+    if (lastValue !== undefined) direction = value >= lastValue ? 1 : -1
     lastValue = value
   })
 </script>
