@@ -149,6 +149,7 @@ Then perform any code / config changes from the migration plan.
 After every install (B3 and/or B4), run in order:
 
 ```bash
+pnpm build
 pnpm lint
 pnpm test
 pnpm test:integration
@@ -158,6 +159,21 @@ pnpm test:integration
 - If any fail: show errors, attempt to fix them (e.g. update deprecated API
   calls, adjust config), re-run the failing command, and repeat until clean
   or until a fix requires user input.
+
+**Supply-chain policy error (`ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION`):**
+If `pnpm install` or `pnpm test` fails with this error, it means one or more
+upgraded packages were published too recently and are blocked by the workspace's
+`minimumReleaseAge` policy. When this happens:
+
+1. Identify the offending packages from the error output.
+2. **Exclude those packages from this upgrade task** — revert them to their
+   previous versions in `package.json`.
+3. Also remove any entries pnpm auto-added for those packages in
+   `pnpm-workspace.yaml` under `minimumReleaseAgeExclude`.
+4. Re-run `pnpm install` to update the lockfile.
+5. Inform the user which packages were excluded and why (published within the
+   24 h release-age window). They can be picked up in the next upgrade run once
+   the window has passed.
 
 ---
 
