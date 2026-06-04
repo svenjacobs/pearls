@@ -144,7 +144,26 @@ pnpm install
 
 Then perform any code / config changes from the migration plan.
 
-### B5 — Verification suite
+### B5 — Supply-chain policy check (run after every install)
+
+After every `pnpm install`, immediately inspect `pnpm-workspace.yaml`:
+
+```bash
+grep -A20 'minimumReleaseAgeExclude' pnpm-workspace.yaml || echo "none"
+```
+
+If pnpm **auto-added** any entries under `minimumReleaseAgeExclude`, those packages
+were published too recently and will fail CI's `--frozen-lockfile` check. Treat them
+exactly as described in the supply-chain policy error section below:
+
+1. Revert each offending package to its previous version in `package.json`.
+2. Remove all auto-added entries from `pnpm-workspace.yaml`.
+3. Run `pnpm clean --lockfile && pnpm install` to rebuild the lockfile cleanly.
+4. Repeat this check until `minimumReleaseAgeExclude` is empty (or absent).
+
+Only proceed to the verification suite once the section is clean.
+
+### B6 — Verification suite
 
 After every install (B3 and/or B4), run in order:
 
@@ -161,16 +180,17 @@ pnpm test:integration
   or until a fix requires user input.
 
 **Supply-chain policy error (`ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION`):**
-If `pnpm install` or `pnpm test` fails with this error, it means one or more
-upgraded packages were published too recently and are blocked by the workspace's
-`minimumReleaseAge` policy. When this happens:
+This error on CI means the `pnpm-workspace.yaml` supply-chain check was bypassed
+locally. pnpm silently adds offending packages to `minimumReleaseAgeExclude` during
+local installs instead of failing — the B5 check above catches this before commit.
+If the error still surfaces (e.g. from a stale lockfile), follow the same steps:
 
 1. Identify the offending packages from the error output.
 2. **Exclude those packages from this upgrade task** — revert them to their
    previous versions in `package.json`.
-3. Also remove any entries pnpm auto-added for those packages in
-   `pnpm-workspace.yaml` under `minimumReleaseAgeExclude`.
-4. Re-run `pnpm install` to update the lockfile.
+3. Remove any entries pnpm auto-added under `minimumReleaseAgeExclude` in
+   `pnpm-workspace.yaml`.
+4. Run `pnpm clean --lockfile && pnpm install` to rebuild the lockfile.
 5. Inform the user which packages were excluded and why (published within the
    24 h release-age window). They can be picked up in the next upgrade run once
    the window has passed.
