@@ -6,6 +6,7 @@
   import * as m from '$lib/paraglide/messages.js'
 
   import type { ActionData, PageData } from './$types'
+  import InstallPrompt from './InstallPrompt.svelte'
 
   let { form, data }: { form: ActionData; data: PageData } = $props()
 
@@ -47,13 +48,15 @@
   <title>Pearls</title>
 </svelte:head>
 
-<div class="flex min-h-svh flex-col">
+<div class="relative flex min-h-svh flex-col">
+  <!-- Anchored to the page (not <main>) so the install prompt can't push it down. -->
+  <div class="absolute top-4 right-4 z-20">
+    <ThemeSwitch
+      class="border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:text-gray-900 active:scale-[0.97] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+    />
+  </div>
+  <InstallPrompt />
   <main class="relative flex flex-1 flex-col items-center justify-center gap-12 px-6 py-8 sm:py-16">
-    <div class="absolute top-4 right-4">
-      <ThemeSwitch
-        class="border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:text-gray-900 active:scale-[0.97] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-      />
-    </div>
     <!-- Decorative pearl -->
     <div class="relative">
       <svg
