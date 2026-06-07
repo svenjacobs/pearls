@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.2](https://github.com/svenjacobs/pearls/compare/pearls-v1.4.1...pearls-v1.4.2) (2026-06-07)
+
+
+### Bug Fixes
+
+* **deps:** upgrade dependencies ([#36](https://github.com/svenjacobs/pearls/issues/36)) ([80dafe8](https://github.com/svenjacobs/pearls/commit/80dafe808fea07c3fc5adee998a2b7115cf6ac15))
+
 ## [1.4.1](https://github.com/svenjacobs/pearls/compare/pearls-v1.4.0...pearls-v1.4.1) (2026-06-04)
 
 
