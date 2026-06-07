@@ -146,6 +146,10 @@ Then perform any code / config changes from the migration plan.
 
 ### B5 — Supply-chain policy check (run after every install)
 
+Since pnpm 11.0, `minimumReleaseAge` defaults to **1440 (24 h)** even when not
+set explicitly — so any package published within the last 24 h is blocked by
+default. This is why pnpm may auto-exclude freshly-published upgrades.
+
 After every `pnpm install`, immediately inspect `pnpm-workspace.yaml`:
 
 ```bash
@@ -202,6 +206,12 @@ If the error still surfaces (e.g. from a stale lockfile), follow the same steps:
 - This project uses **pnpm**. Never use `npm install` or `yarn`.
 - All packages belong in `devDependencies` (`pnpm add -D`). SvelteKit/Vite
   bundles everything at build time.
+- **Commit and PR titles must start with the `fix(deps):` prefix** (e.g.
+  `fix(deps): upgrade dependencies`). release-please only bumps the version on
+  `feat`/`fix`/breaking commit types — a `chore(deps):` title produces no
+  release. Since PRs are squash-merged using the **PR title** as the commit
+  header, the PR title alone determines whether a patch release is cut, so it
+  must use `fix(deps):` for the upgrade to ship.
 - Integration tests (`pnpm test:integration`) require Podman or Docker. If
   the container runtime is unavailable, skip that step and inform the user.
 - If `pnpx npm-check-updates` is not available, ask the user to ensure
