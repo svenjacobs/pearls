@@ -114,7 +114,7 @@ Then install dependencies:
 pnpm install
 ```
 
-Then run the verification suite (Step B5). Report results to the user.
+Then run the verification suite (Step B6). Report results to the user.
 
 ### B4 — Research and confirm major upgrades
 
@@ -144,7 +144,40 @@ pnpm install
 
 Then perform any code / config changes from the migration plan.
 
-### B5 — Supply-chain policy check (run after every install)
+### B5 — allowBuilds security check (run after every install)
+
+`allowBuilds` in `pnpm-workspace.yaml` controls which packages are permitted to
+run post-install scripts (native builds, lifecycle hooks). Adding an entry is a
+security decision — it grants a package arbitrary code execution during install.
+
+After every `pnpm install`, inspect the `allowBuilds` section:
+
+```bash
+grep -A30 'allowBuilds' pnpm-workspace.yaml
+```
+
+Compare the current entries against what was there **before** this upgrade run.
+If `pnpm install` has requested (via a warning or error) that a new entry be
+added, or if you notice the install failed because a package's build script was
+blocked:
+
+**Do not add the entry automatically.** Instead, pause and ask the user:
+
+> Package **`<name>`** requires an `allowBuilds` entry in `pnpm-workspace.yaml`
+> to run its install script. This grants it arbitrary code execution during
+> `pnpm install`. Do you want to allow it?
+
+Present what is known about the package (purpose, publisher, download count,
+whether it is a transitive or direct dependency) so the user can make an
+informed decision. Wait for explicit confirmation before adding the entry or
+continuing.
+
+If the user declines, revert the package upgrade that introduced the requirement
+and continue with the remaining upgrades.
+
+---
+
+### B6 — Supply-chain policy check (run after every install)
 
 Since pnpm 11.0, `minimumReleaseAge` defaults to **1440 (24 h)** even when not
 set explicitly — so any package published within the last 24 h is blocked by
@@ -167,7 +200,7 @@ exactly as described in the supply-chain policy error section below:
 
 Only proceed to the verification suite once the section is clean.
 
-### B6 — Verification suite
+### B7 — Verification suite
 
 After every install (B3 and/or B4), run in order:
 
