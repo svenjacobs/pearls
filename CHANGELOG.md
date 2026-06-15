@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.3](https://github.com/svenjacobs/pearls/compare/pearls-v1.4.2...pearls-v1.4.3) (2026-06-15)
+
+
+### Bug Fixes
+
+* **deps:** upgrade dependencies ([#38](https://github.com/svenjacobs/pearls/issues/38)) ([ae52920](https://github.com/svenjacobs/pearls/commit/ae52920db1b3dfb09de61f3b45ba6d000ca8329e))
+* **sse:** harden real-time updates against slow/dropped connections ([#40](https://github.com/svenjacobs/pearls/issues/40)) ([5589ab2](https://github.com/svenjacobs/pearls/commit/5589ab224db147d6fb5d26a692e09cec004144f8))
+
 ## [1.4.2](https://github.com/svenjacobs/pearls/compare/pearls-v1.4.1...pearls-v1.4.2) (2026-06-07)
 
 
