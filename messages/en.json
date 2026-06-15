@@ -67,6 +67,7 @@
   "error_500_detail": "An unexpected error occurred on our end. Try again in a moment.",
   "error_generic_heading": "An error occurred",
   "game_waiting": "Waiting for another player to join…",
+  "game_reconnecting": "Reconnecting…",
   "game_abort_confirm": "Abort this game?",
   "action_abort_game": "Abort Game",
   "action_confirm": "Confirm",

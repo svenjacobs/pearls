@@ -62,7 +62,7 @@ describe('connectSse', () => {
   })
 
   it('opens EventSource immediately on connect', () => {
-    const cleanup = connectSse('/api/game/events', vi.fn())
+    const cleanup = connectSse('/api/game/events', { onRefresh: vi.fn() })
     expect(MockEventSource.instances).toHaveLength(1)
     expect(MockEventSource.instances[0].url).toBe('/api/game/events')
     cleanup()
@@ -70,7 +70,7 @@ describe('connectSse', () => {
 
   it('calls onRefresh when refresh event fires', () => {
     const onRefresh = vi.fn()
-    const cleanup = connectSse('/api/game/events', onRefresh)
+    const cleanup = connectSse('/api/game/events', { onRefresh })
     MockEventSource.instances[0].dispatch('refresh')
     expect(onRefresh).toHaveBeenCalledOnce()
     cleanup()
@@ -78,14 +78,17 @@ describe('connectSse', () => {
 
   it('registers extra event listeners', () => {
     const onReaction = vi.fn()
-    const cleanup = connectSse('/api/game/events', vi.fn(), { reaction: onReaction })
+    const cleanup = connectSse('/api/game/events', {
+      onRefresh: vi.fn(),
+      extras: { reaction: onReaction },
+    })
     MockEventSource.instances[0].dispatch('reaction')
     expect(onReaction).toHaveBeenCalledOnce()
     cleanup()
   })
 
   it('closes source and removes listener on cleanup', () => {
-    const cleanup = connectSse('/api/game/events', vi.fn())
+    const cleanup = connectSse('/api/game/events', { onRefresh: vi.fn() })
     const source = MockEventSource.instances[0]
     cleanup()
     expect(source.readyState).toBe(MockEventSource.CLOSED)
@@ -96,7 +99,7 @@ describe('connectSse', () => {
   })
 
   it('closes SSE when tab becomes hidden', () => {
-    const cleanup = connectSse('/api/game/events', vi.fn())
+    const cleanup = connectSse('/api/game/events', { onRefresh: vi.fn() })
     const source = MockEventSource.instances[0]
     expect(source.readyState).toBe(MockEventSource.OPEN)
 
@@ -109,7 +112,7 @@ describe('connectSse', () => {
 
   it('does not call onRefresh when tab becomes hidden', () => {
     const onRefresh = vi.fn()
-    const cleanup = connectSse('/api/game/events', onRefresh)
+    const cleanup = connectSse('/api/game/events', { onRefresh })
 
     setVisibility('hidden')
     fireVisibilityChange()
@@ -120,7 +123,7 @@ describe('connectSse', () => {
 
   it('calls onRefresh and reconnects when tab becomes visible after hidden', () => {
     const onRefresh = vi.fn()
-    const cleanup = connectSse('/api/game/events', onRefresh)
+    const cleanup = connectSse('/api/game/events', { onRefresh })
 
     setVisibility('hidden')
     fireVisibilityChange()
@@ -136,7 +139,7 @@ describe('connectSse', () => {
 
   it('calls onRefresh on visibility-visible even when source is already open', () => {
     const onRefresh = vi.fn()
-    const cleanup = connectSse('/api/game/events', onRefresh)
+    const cleanup = connectSse('/api/game/events', { onRefresh })
     // source stays OPEN (no hidden transition)
     setVisibility('visible')
     fireVisibilityChange()
@@ -144,5 +147,58 @@ describe('connectSse', () => {
     // no new EventSource created since readyState is OPEN
     expect(MockEventSource.instances).toHaveLength(1)
     cleanup()
+  })
+
+  it('reports connection state on open and error', () => {
+    const onConnectionChange = vi.fn()
+    const cleanup = connectSse('/api/game/events', { onRefresh: vi.fn(), onConnectionChange })
+
+    MockEventSource.instances[0].dispatch('open')
+    expect(onConnectionChange).toHaveBeenLastCalledWith(true)
+
+    MockEventSource.instances[0].dispatch('error')
+    expect(onConnectionChange).toHaveBeenLastCalledWith(false)
+    cleanup()
+  })
+
+  describe('silence watchdog', () => {
+    beforeEach(() => vi.useFakeTimers())
+    afterEach(() => vi.useRealTimers())
+
+    it('reconnects and refreshes after prolonged silence', () => {
+      const onRefresh = vi.fn()
+      const cleanup = connectSse('/api/game/events', { onRefresh })
+
+      vi.advanceTimersByTime(60_000)
+
+      expect(onRefresh).toHaveBeenCalledOnce()
+      expect(MockEventSource.instances).toHaveLength(2)
+      cleanup()
+    })
+
+    it('does not reconnect while heartbeats keep arriving', () => {
+      const onRefresh = vi.fn()
+      const cleanup = connectSse('/api/game/events', { onRefresh })
+
+      vi.advanceTimersByTime(40_000)
+      MockEventSource.instances[0].dispatch('heartbeat')
+      vi.advanceTimersByTime(40_000)
+
+      // 80 s elapsed but never 60 s without a frame → no reconnect.
+      expect(onRefresh).not.toHaveBeenCalled()
+      expect(MockEventSource.instances).toHaveLength(1)
+      cleanup()
+    })
+
+    it('clears the watchdog on cleanup', () => {
+      const onRefresh = vi.fn()
+      const cleanup = connectSse('/api/game/events', { onRefresh })
+      cleanup()
+
+      vi.advanceTimersByTime(120_000)
+
+      expect(onRefresh).not.toHaveBeenCalled()
+      expect(MockEventSource.instances).toHaveLength(1)
+    })
   })
 })

@@ -21,8 +21,9 @@ import type { RequestHandler } from './$types'
  * - `retry: 2000` tells the browser to reconnect within 2 s after a drop.
  * - `id:` on every refresh event enables `Last-Event-ID` on reconnect so the
  *   server can detect a gap and immediately flush a refresh event.
- * - A 25 s heartbeat comment keeps the TCP connection alive through proxies
- *   and firewalls that silently close idle streams.
+ * - A 25 s named `heartbeat` event keeps the TCP connection alive through proxies
+ *   and firewalls that silently close idle streams, and lets the client observe
+ *   liveness (a `:` comment is never surfaced to JS) to drive its own watchdog.
  *
  * Client-side usage:
  *   const es = new EventSource('/api/game/events')
@@ -41,19 +42,28 @@ export const GET: RequestHandler = async ({ cookies, request }) => {
   let cleanup: (() => Promise<void>) | undefined
   let heartbeatTimer: ReturnType<typeof setInterval> | undefined
   let closed = false
+  // When the client socket is backed up (desiredSize <= 0) we don't buffer
+  // another refresh — we coalesce it and flush a single one once `pull` fires.
+  // Safe because `refresh` is idempotent: the client always refetches full state.
+  let refreshPending = false
+
+  const encoder = new TextEncoder()
+  const refreshFrame = () =>
+    encoder.encode(`id: ${Date.now()}\nretry: 2000\nevent: refresh\ndata: 1\n\n`)
 
   const stream = new ReadableStream({
     async start(controller) {
-      const encoder = new TextEncoder()
+      const hasRoom = () => controller.desiredSize === null || controller.desiredSize > 0
 
       const sendRefresh = () => {
         if (closed) return
-        const id = Date.now()
-        controller.enqueue(encoder.encode(`id: ${id}\nretry: 2000\nevent: refresh\ndata: 1\n\n`))
+        if (hasRoom()) controller.enqueue(refreshFrame())
+        else refreshPending = true
       }
 
       const sendReaction = (evt: Extract<GameEvent, { event: 'reaction' }>) => {
-        if (closed) return
+        // Reactions are cosmetic; drop them under backpressure rather than buffer.
+        if (closed || !hasRoom()) return
         controller.enqueue(encoder.encode(`event: reaction\ndata: ${JSON.stringify(evt)}\n\n`))
       }
 
@@ -61,7 +71,8 @@ export const GET: RequestHandler = async ({ cookies, request }) => {
         if (closed) return
         markPlayerActive(session.gameId, session.playerId)
         clearPendingNotification(session.gameId, session.playerId)
-        controller.enqueue(encoder.encode(': heartbeat\n\n'))
+        // Named event (not a `:` comment) so the client can observe liveness.
+        if (hasRoom()) controller.enqueue(encoder.encode(`event: heartbeat\ndata: 1\n\n`))
       }
 
       const listener = await addGameListener(session.gameId, (evt) => {
@@ -81,6 +92,12 @@ export const GET: RequestHandler = async ({ cookies, request }) => {
 
       // Keep the connection alive through mobile proxies / firewalls.
       heartbeatTimer = setInterval(sendHeartbeat, 25_000)
+    },
+    pull(controller) {
+      // The consumer drained — flush a coalesced refresh if one is waiting.
+      if (closed || !refreshPending) return
+      refreshPending = false
+      controller.enqueue(refreshFrame())
     },
     async cancel() {
       closed = true

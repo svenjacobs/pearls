@@ -59,9 +59,29 @@ export const publishGameEvent = async (gameId: string, payload: GameEvent): Prom
 const listeners = new Map<string, Set<(event: GameEvent) => void>>()
 let sharedSubscriber: ReturnType<typeof redis.duplicate> | null = null
 
+/** Broadcast a synthetic refresh to every in-process listener on every channel. */
+const flushRefreshToAllListeners = () => {
+  listeners.forEach((set) => set.forEach((fn) => fn({ event: 'refresh' })))
+}
+
 /** Call once at server startup (after connectRedis). */
 export const initSharedSubscriber = async (): Promise<void> => {
   sharedSubscriber = redis.duplicate()
+
+  // Redis pub/sub is at-most-once: any message published while the subscriber is
+  // disconnected is lost. node-redis auto-resubscribes channels on reconnect, so
+  // on every reconnect (a second `ready`) we flush a refresh to all listeners,
+  // forcing every connected client to refetch and recover from the gap.
+  let everReady = false
+  sharedSubscriber.on('error', (err) => logger.error({ err }, 'Shared subscriber error'))
+  sharedSubscriber.on('ready', () => {
+    if (everReady) {
+      logger.warn('Shared subscriber reconnected — flushing refresh to all listeners')
+      flushRefreshToAllListeners()
+    }
+    everReady = true
+  })
+
   await sharedSubscriber.connect()
   logger.info('Shared subscriber initialized')
 }
