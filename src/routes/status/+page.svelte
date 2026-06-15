@@ -1,7 +1,10 @@
 <script lang="ts">
+  import { debounce } from 'es-toolkit'
+
   import { invalidateAll } from '$app/navigation'
   import CloseButton from '$lib/components/CloseButton.svelte'
   import Footer from '$lib/components/Footer.svelte'
+  import ReconnectingBanner from '$lib/components/ReconnectingBanner.svelte'
   import * as m from '$lib/paraglide/messages.js'
   import { connectSse } from '$lib/sse'
 
@@ -10,12 +13,24 @@
 
   let { data }: { data: PageData } = $props()
 
-  $effect(() => connectSse('/api/status/events', () => void invalidateAll()))
+  // Collapse bursts of refresh events into a single refetch.
+  const refresh = debounce(() => void invalidateAll(), 80, { edges: ['leading', 'trailing'] })
+
+  let connected = $state(true)
+
+  $effect(() =>
+    connectSse('/api/status/events', {
+      onRefresh: refresh,
+      onConnectionChange: (c) => (connected = c),
+    }),
+  )
 </script>
 
 <svelte:head>
   <title>Pearls — {m.status_title()}</title>
 </svelte:head>
+
+<ReconnectingBanner show={!connected} />
 
 <div class="flex min-h-svh flex-col">
   <main class="relative flex flex-1 flex-col items-center justify-center gap-6 p-6 py-10">

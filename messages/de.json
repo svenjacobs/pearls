@@ -67,6 +67,7 @@
   "error_500_detail": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es gleich noch einmal.",
   "error_generic_heading": "Ein Fehler ist aufgetreten",
   "game_waiting": "Warte auf einen weiteren Spieler…",
+  "game_reconnecting": "Verbindung wird wiederhergestellt…",
   "game_abort_confirm": "Dieses Spiel abbrechen?",
   "action_abort_game": "Spiel abbrechen",
   "action_confirm": "Bestätigen",

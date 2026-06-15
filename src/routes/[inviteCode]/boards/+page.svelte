@@ -1,6 +1,9 @@
 <script lang="ts">
+  import { debounce } from 'es-toolkit'
+
   import { invalidateAll } from '$app/navigation'
   import CloseButton from '$lib/components/CloseButton.svelte'
+  import ReconnectingBanner from '$lib/components/ReconnectingBanner.svelte'
   import { formatDuration } from '$lib/duration'
   import * as m from '$lib/paraglide/messages.js'
   import { getThemeColors } from '$lib/pearl-themes'
@@ -11,7 +14,17 @@
 
   let { data }: { data: PageData } = $props()
 
-  $effect(() => connectSse('/api/game/events', () => void invalidateAll()))
+  // Collapse bursts of refresh events into a single refetch.
+  const refresh = debounce(() => void invalidateAll(), 80, { edges: ['leading', 'trailing'] })
+
+  let connected = $state(true)
+
+  $effect(() =>
+    connectSse('/api/game/events', {
+      onRefresh: refresh,
+      onConnectionChange: (c) => (connected = c),
+    }),
+  )
 
   let elapsed = $state(0)
 
@@ -23,6 +36,8 @@
     return () => clearInterval(id)
   })
 </script>
+
+<ReconnectingBanner show={!connected} />
 
 <main class="flex min-h-svh flex-col items-center gap-8 p-6 py-10">
   <div class="flex w-full max-w-5xl items-center justify-between">

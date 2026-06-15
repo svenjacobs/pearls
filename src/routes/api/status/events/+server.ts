@@ -22,27 +22,45 @@ const addStatusListener = (fn: () => void): (() => void) => {
   }
 }
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ request }) => {
+  // On reconnect the client sends the id of the last event it saw; flush a
+  // refresh immediately so it catches up on any state it missed during the gap.
+  const isReconnect = request.headers.has('last-event-id')
+
   let cleanup: (() => void) | undefined
   let heartbeatTimer: ReturnType<typeof setInterval> | undefined
   let closed = false
+  // Coalesce refreshes under backpressure — refresh is idempotent (full refetch).
+  let refreshPending = false
+
+  const encoder = new TextEncoder()
+  const refreshFrame = () =>
+    encoder.encode(`id: ${Date.now()}\nretry: 2000\nevent: refresh\ndata: 1\n\n`)
 
   const stream = new ReadableStream({
     start(controller) {
-      const encoder = new TextEncoder()
+      const hasRoom = () => controller.desiredSize === null || controller.desiredSize > 0
 
       const sendRefresh = () => {
         if (closed) return
-        controller.enqueue(encoder.encode(`retry: 2000\nevent: refresh\ndata: 1\n\n`))
+        if (hasRoom()) controller.enqueue(refreshFrame())
+        else refreshPending = true
       }
 
       const sendHeartbeat = () => {
         if (closed) return
-        controller.enqueue(encoder.encode(': heartbeat\n\n'))
+        // Named event (not a `:` comment) so the client can observe liveness.
+        if (hasRoom()) controller.enqueue(encoder.encode(`event: heartbeat\ndata: 1\n\n`))
       }
 
       cleanup = addStatusListener(sendRefresh)
+      if (isReconnect) sendRefresh()
       heartbeatTimer = setInterval(sendHeartbeat, 25_000)
+    },
+    pull(controller) {
+      if (closed || !refreshPending) return
+      refreshPending = false
+      controller.enqueue(refreshFrame())
     },
     cancel() {
       closed = true

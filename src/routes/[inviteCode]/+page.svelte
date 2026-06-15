@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { debounce } from 'es-toolkit'
   import { untrack } from 'svelte'
 
   import { invalidateAll } from '$app/navigation'
@@ -20,6 +21,7 @@
   import LeaveGameButton from '$lib/components/LeaveGameButton.svelte'
   import InitiativeBoard from '$lib/components/lobby/InitiativeBoard.svelte'
   import Notification from '$lib/components/Notification.svelte'
+  import ReconnectingBanner from '$lib/components/ReconnectingBanner.svelte'
   import ThemeSwitch from '$lib/components/ThemeSwitch.svelte'
   import { notification } from '$lib/notification.svelte'
   import * as m from '$lib/paraglide/messages.js'
@@ -116,9 +118,17 @@
   //
   // connectSse handles reconnection and the visibilitychange / background-tab fix.
 
+  // Collapse the burst of events a single action emits (turn-rolled, board,
+  // staged…) into one refetch instead of one per event.
+  const refresh = debounce(() => void invalidateAll(), 80, { edges: ['leading', 'trailing'] })
+
+  let connected = $state(true)
+
   $effect(() =>
-    connectSse('/api/game/events', () => void invalidateAll(), {
-      reaction: (e) => reactionController?.onSseReaction(e),
+    connectSse('/api/game/events', {
+      onRefresh: refresh,
+      extras: { reaction: (e) => reactionController?.onSseReaction(e) },
+      onConnectionChange: (c) => (connected = c),
     }),
   )
 
@@ -576,6 +586,8 @@
 <svelte:head>
   <title>Pearls ({data.inviteCode})</title>
 </svelte:head>
+
+<ReconnectingBanner show={!connected} />
 
 <ReactionController bind:this={reactionController} {reactionsEnabled} />
 

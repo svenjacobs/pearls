@@ -20,9 +20,15 @@ import { redis } from '$lib/server/redis'
 
 // Per-channel subscribe callbacks captured from the fake subscriber.
 const subscribeHandlers = new Map<string, (msg: string) => void>()
+// Client lifecycle handlers registered via `subscriber.on(event, handler)`.
+const clientHandlers = new Map<string, Array<() => void>>()
 
 const simulateMessage = (gameId: string, event: GameEvent) => {
   subscribeHandlers.get(`game:${gameId}`)?.(JSON.stringify(event))
+}
+
+const emitClientEvent = (event: string) => {
+  clientHandlers.get(event)?.forEach((fn) => fn())
 }
 
 describe('pubsub shared subscriber', () => {
@@ -31,10 +37,12 @@ describe('pubsub shared subscriber', () => {
     subscribe: ReturnType<typeof vi.fn>
     unsubscribe: ReturnType<typeof vi.fn>
     quit: ReturnType<typeof vi.fn>
+    on: ReturnType<typeof vi.fn>
   }
 
   beforeEach(async () => {
     subscribeHandlers.clear()
+    clientHandlers.clear()
     fakeSubscriber = {
       connect: vi.fn().mockResolvedValue(undefined),
       subscribe: vi.fn().mockImplementation(async (channel: string, cb: (msg: string) => void) => {
@@ -42,6 +50,10 @@ describe('pubsub shared subscriber', () => {
       }),
       unsubscribe: vi.fn().mockResolvedValue(undefined),
       quit: vi.fn().mockResolvedValue(undefined),
+      on: vi.fn().mockImplementation((event: string, handler: () => void) => {
+        if (!clientHandlers.has(event)) clientHandlers.set(event, [])
+        clientHandlers.get(event)!.push(handler)
+      }),
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(redis.duplicate).mockReturnValue(fakeSubscriber as any)
@@ -116,5 +128,23 @@ describe('pubsub shared subscriber', () => {
     expect(fakeSubscriber.subscribe).toHaveBeenCalledTimes(2)
     expect(fakeSubscriber.subscribe).toHaveBeenCalledWith('game:game-1', expect.any(Function))
     expect(fakeSubscriber.subscribe).toHaveBeenCalledWith('game:game-2', expect.any(Function))
+  })
+
+  it('flushes a refresh to all listeners when the subscriber reconnects', async () => {
+    const listener1 = vi.fn()
+    const listener2 = vi.fn()
+    await addGameListener('game-1', listener1)
+    await addGameListener('game-2', listener2)
+
+    // First `ready` is the initial connect — must not flush.
+    emitClientEvent('ready')
+    expect(listener1).not.toHaveBeenCalled()
+    expect(listener2).not.toHaveBeenCalled()
+
+    // A subsequent `ready` is a reconnect — flush a refresh to every listener so
+    // clients recover from events lost during the gap.
+    emitClientEvent('ready')
+    expect(listener1).toHaveBeenCalledExactlyOnceWith({ event: 'refresh' })
+    expect(listener2).toHaveBeenCalledExactlyOnceWith({ event: 'refresh' })
   })
 })
