@@ -89,10 +89,16 @@ describe('GET /api/game/events — stream setup', () => {
     await reader.cancel()
   })
 
-  it('does not flush a refresh on a fresh connection', async () => {
+  it('flushes a heartbeat immediately on a fresh connection (no refresh)', async () => {
+    // The first byte forces the response headers out so the browser fires `open`
+    // right away instead of stalling until the first 25 s heartbeat. A fresh
+    // connection must not flush a refresh — the page already has fresh SSR state.
     const res = await GET(makeEvent())
     await flush()
     const reader = (res.body as ReadableStream<Uint8Array>).getReader()
+    const frame = await readFrame(reader)
+    expect(frame).toContain('event: heartbeat')
+    expect(frame).not.toContain('event: refresh')
     expect(await readOrTimeout(reader, 30)).toBe(TIMEOUT)
     await reader.cancel()
   })
@@ -103,6 +109,7 @@ describe('GET /api/game/events — event delivery', () => {
     const res = await GET(makeEvent())
     await flush()
     const reader = (res.body as ReadableStream<Uint8Array>).getReader()
+    expect(await readFrame(reader)).toContain('event: heartbeat') // initial flush
 
     emit({ event: 'turn-ended', turnId: 't1' })
 
@@ -114,6 +121,7 @@ describe('GET /api/game/events — event delivery', () => {
     const res = await GET(makeEvent())
     await flush()
     const reader = (res.body as ReadableStream<Uint8Array>).getReader()
+    expect(await readFrame(reader)).toContain('event: heartbeat') // initial flush
 
     const reaction: GameEvent = {
       event: 'reaction',
@@ -129,20 +137,21 @@ describe('GET /api/game/events — event delivery', () => {
     await reader.cancel()
   })
 
-  it('coalesces refreshes under backpressure (3 events → 2 frames)', async () => {
+  it('coalesces refreshes under backpressure (3 events → 1 frame after heartbeat)', async () => {
     const res = await GET(makeEvent())
     await flush()
     const reader = (res.body as ReadableStream<Uint8Array>).getReader()
 
-    // Nothing has been read, so the queue backs up after the first frame.
+    // The initial heartbeat occupies the only queue slot, so nothing has been
+    // read yet and all three events back up behind it.
     emit({ event: 'turn-rolled', turnId: 't1' })
     emit({ event: 'board', playerId: PLAYER_ID, board: [] })
     emit({ event: 'staged', playerId: PLAYER_ID, staged: [] })
 
-    // One enqueued directly, one coalesced and flushed by pull() on drain.
+    expect(await readFrame(reader)).toContain('event: heartbeat') // initial flush
+    // Draining the heartbeat lets pull() flush the single coalesced refresh.
     expect(await readFrame(reader)).toContain('event: refresh')
-    expect(await readFrame(reader)).toContain('event: refresh')
-    // No third frame — the middle/last events collapsed into one.
+    // No further frame — all three events collapsed into one.
     expect(await readOrTimeout(reader, 30)).toBe(TIMEOUT)
     await reader.cancel()
   })

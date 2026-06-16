@@ -54,7 +54,12 @@ export const GET: RequestHandler = async ({ request }) => {
       }
 
       cleanup = addStatusListener(sendRefresh)
+      // Flush a frame immediately so the response headers are sent right away:
+      // the browser only fires `open` (and proxies only start streaming) once the
+      // first byte arrives. Without this a fresh connection would stall until the
+      // first 25 s heartbeat, leaving the client stuck "reconnecting".
       if (isReconnect) sendRefresh()
+      else sendHeartbeat()
       heartbeatTimer = setInterval(sendHeartbeat, 25_000)
     },
     pull(controller) {
