@@ -50,6 +50,18 @@ describe('GET /api/status/events', () => {
     await (res.body as ReadableStream<Uint8Array>).cancel()
   })
 
+  it('flushes a heartbeat immediately on a fresh connection (no refresh)', async () => {
+    // The first byte forces the response headers out so the browser fires `open`
+    // right away instead of stalling until the first 25 s heartbeat — otherwise
+    // the client would sit "reconnecting" for the whole interval.
+    const res = await GET(makeEvent())
+    const reader = (res.body as ReadableStream<Uint8Array>).getReader()
+    const frame = await readFrame(reader)
+    expect(frame).toContain('event: heartbeat')
+    expect(frame).not.toContain('event: refresh')
+    await reader.cancel()
+  })
+
   it('flushes a refresh immediately when reconnecting (Last-Event-ID present)', async () => {
     const res = await GET(makeEvent({ 'last-event-id': '123' }))
     const reader = (res.body as ReadableStream<Uint8Array>).getReader()
@@ -61,6 +73,7 @@ describe('GET /api/status/events', () => {
     const res = await GET(makeEvent())
     await flush()
     const reader = (res.body as ReadableStream<Uint8Array>).getReader()
+    expect(await readFrame(reader)).toContain('event: heartbeat') // initial flush
 
     fireGlobalEvent()
 
@@ -68,16 +81,18 @@ describe('GET /api/status/events', () => {
     await reader.cancel()
   })
 
-  it('coalesces refreshes under backpressure (3 events → 2 frames)', async () => {
+  it('coalesces refreshes under backpressure (3 events → 1 frame after heartbeat)', async () => {
     const res = await GET(makeEvent())
     await flush()
     const reader = (res.body as ReadableStream<Uint8Array>).getReader()
 
+    // The initial heartbeat occupies the only queue slot, so all three events
+    // back up behind it and coalesce.
     fireGlobalEvent()
     fireGlobalEvent()
     fireGlobalEvent()
 
-    expect(await readFrame(reader)).toContain('event: refresh')
+    expect(await readFrame(reader)).toContain('event: heartbeat') // initial flush
     expect(await readFrame(reader)).toContain('event: refresh')
     expect(await readOrTimeout(reader, 30)).toBe(TIMEOUT)
     await reader.cancel()

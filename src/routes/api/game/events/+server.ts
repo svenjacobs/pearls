@@ -87,8 +87,13 @@ export const GET: RequestHandler = async ({ cookies, request }) => {
       // Mark the player as actively viewing this game.
       markPlayerActive(session.gameId, session.playerId)
 
-      // Flush stale state immediately on reconnect.
+      // Flush a frame immediately so the response headers are sent right away:
+      // the browser only fires `open` (and proxies only start streaming) once the
+      // first byte arrives. Without this a fresh connection would stall until the
+      // first 25 s heartbeat, leaving the client stuck "reconnecting". On reconnect
+      // a refresh doubles as that first byte and catches up on missed state.
       if (isReconnect) sendRefresh()
+      else sendHeartbeat()
 
       // Keep the connection alive through mobile proxies / firewalls.
       heartbeatTimer = setInterval(sendHeartbeat, 25_000)
