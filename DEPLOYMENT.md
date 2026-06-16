@@ -319,7 +319,7 @@ curl -sf -X POST https://pearls.example.com/api/admin/cleanup \
 
 ## nginx notes
 
-The nginx configuration in `deploy/nginx.conf` (Quadlet) and `deploy/nginx.compose.conf` (Compose) includes a dedicated location block for `/api/game/events`, the Server-Sent Events endpoint:
+The nginx configurations include a dedicated location block for **each** Server-Sent Events endpoint — `/api/game/events` and `/api/status/events`:
 
 ```nginx
 location /api/game/events {
@@ -328,11 +328,19 @@ location /api/game/events {
     proxy_read_timeout 86400s;
     ...
 }
+
+location /api/status/events {
+    proxy_buffering    off;
+    proxy_cache        off;
+    proxy_read_timeout 86400s;
+    ...
+}
 ```
 
 - `proxy_buffering off` — required for SSE; nginx must not buffer the response before forwarding
-- `proxy_read_timeout 86400s` — SSE connections are long-lived; the server sends a heartbeat comment every 25 s to keep them alive through firewalls
+- `proxy_read_timeout 86400s` — SSE connections are long-lived; the server sends a heartbeat event every 25 s to keep them alive through firewalls
 - The `retry: 2000` field in SSE frames instructs browsers to reconnect within 2 s after a drop
+- **Both** endpoints need their own block. A generic `location /api/` (used by the rate-limiting configs for other API routes) applies a short `proxy_read_timeout` and leaves buffering on, which breaks a long-lived stream — the client then sits permanently "reconnecting". Each SSE route must match its own block, not fall through to `/api/`.
 
 ### TLS / HTTPS
 
