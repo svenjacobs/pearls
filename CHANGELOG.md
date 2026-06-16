@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.4](https://github.com/svenjacobs/pearls/compare/pearls-v1.4.3...pearls-v1.4.4) (2026-06-16)
+
+
+### Bug Fixes
+
+* **sse:** flush initial frame on fresh connection so client sees `open` ([#41](https://github.com/svenjacobs/pearls/issues/41)) ([2c43bc1](https://github.com/svenjacobs/pearls/commit/2c43bc1cabf7e7c248319e736636bdb86f9828a3))
+
 ## [1.4.3](https://github.com/svenjacobs/pearls/compare/pearls-v1.4.2...pearls-v1.4.3) (2026-06-15)
 
 
