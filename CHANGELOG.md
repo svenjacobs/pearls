@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.5](https://github.com/svenjacobs/pearls/compare/pearls-v1.4.4...pearls-v1.4.5) (2026-06-16)
+
+
+### Bug Fixes
+
+* **deploy:** add /api/status/events SSE block to rate-limiting nginx configs ([#43](https://github.com/svenjacobs/pearls/issues/43)) ([296c934](https://github.com/svenjacobs/pearls/commit/296c93417a8980d07406bce0bd00dace07931685))
+
 ## [1.4.4](https://github.com/svenjacobs/pearls/compare/pearls-v1.4.3...pearls-v1.4.4) (2026-06-16)
 
 
