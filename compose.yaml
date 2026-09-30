@@ -1,6 +1,6 @@
 services:
   redis:
-    image: redis:8-alpine
+    image: docker.io/library/redis:8-alpine
     restart: always
     ports:
       - 6379:6379
@@ -10,7 +10,7 @@ services:
     command: redis-server /etc/redis/redis.conf
 
   redis-commander:
-    image: rediscommander/redis-commander
+    image: docker.io/rediscommander/redis-commander
     restart: always
     ports:
       - 8081:8081
