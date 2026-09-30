@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.4.5](https://github.com/svenjacobs/pearls/compare/pearls-v1.4.4...pearls-v1.4.5) (2026-09-30)
+
+
+### Bug Fixes
+
+* **deploy:** add /api/status/events SSE block to rate-limiting nginx configs ([#43](https://github.com/svenjacobs/pearls/issues/43)) ([296c934](https://github.com/svenjacobs/pearls/commit/296c93417a8980d07406bce0bd00dace07931685))
+* **deps:** upgrade dependencies ([#46](https://github.com/svenjacobs/pearls/issues/46)) ([3ce995a](https://github.com/svenjacobs/pearls/commit/3ce995a044f655029f59a1881dd9162cea176164))
+* **dev:** use fully qualified container image names ([#47](https://github.com/svenjacobs/pearls/issues/47)) ([fde276f](https://github.com/svenjacobs/pearls/commit/fde276f7e9d8f558c1307c638be1a5702d29031f))
+
 ## [1.4.4](https://github.com/svenjacobs/pearls/compare/pearls-v1.4.3...pearls-v1.4.4) (2026-06-16)
 
 
