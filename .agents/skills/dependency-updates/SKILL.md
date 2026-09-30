@@ -94,19 +94,22 @@ pnpx npm-check-updates -u --target minor
 
 **Special case — `packageManager` field updated:**
 If the upgrade touches the `packageManager` field in `package.json` (e.g.
-`pnpm@11.1.0 → pnpm@11.1.1`), run `pnpm` once immediately after the
-`npm-check-updates` step to let Corepack download the new version:
+`pnpm@11.1.0 → pnpm@11.1.1`), run pnpm once immediately after
+the `npm-check-updates` step so it fetches the new version:
 
 ```bash
 pnpm --version
 ```
 
-Corepack may prompt something like:
+It should print the new version. pnpm switches itself to the version in
+`packageManager` (e.g. in the Nix dev shell). With Corepack, it may ask first:
+
 ```
 Do you want to continue? [Y/n]
 ```
 
 Respond with `Y` and wait for Corepack to finish downloading before continuing.
+If `pnpm --version` still prints the old version, stop and tell the user.
 
 Then install dependencies:
 
@@ -114,7 +117,24 @@ Then install dependencies:
 pnpm install
 ```
 
-Then run the verification suite (Step B6). Report results to the user.
+**Nix dev shell (only where it's used):**
+Some developers get Node.js and pnpm from the Nix dev shell in `flake.nix`
+(loaded by direnv through `.envrc`), others install them themselves. Only if
+`nix` is on the `PATH`, also update the pinned nixpkgs so the dev shell gets
+Node.js patch and minor releases:
+
+```bash
+node --version
+nix flake update
+nix develop -c node --version
+```
+
+Report the Node.js version change to the user. The current environment still
+has the old Node.js, so run the remaining commands of this upgrade through the
+updated shell (e.g. `nix develop -c pnpm build`). Without `nix`, leave
+`flake.nix` and `flake.lock` alone and use the Node.js and pnpm on the `PATH`.
+
+Then run the verification suite (Step B7). Report results to the user.
 
 ### B4 — Research and confirm major upgrades
 
@@ -219,7 +239,7 @@ pnpm test:integration
 **Supply-chain policy error (`ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION`):**
 This error on CI means the `pnpm-workspace.yaml` supply-chain check was bypassed
 locally. pnpm silently adds offending packages to `minimumReleaseAgeExclude` during
-local installs instead of failing — the B5 check above catches this before commit.
+local installs instead of failing — the B6 check above catches this before commit.
 If the error still surfaces (e.g. from a stale lockfile), follow the same steps:
 
 1. Identify the offending packages from the error output.
@@ -245,6 +265,12 @@ If the error still surfaces (e.g. from a stale lockfile), follow the same steps:
   release. Since PRs are squash-merged using the **PR title** as the commit
   header, the PR title alone determines whether a patch release is cut, so it
   must use `fix(deps):` for the upgrade to ship.
+- The Node.js major version is set in several places: `engines` in
+  `package.json`, `@types/node`, both stages of the Dockerfile
+  (`node:26-alpine`), `node-version` in `.github/workflows/check.yml`,
+  `nodejs_26` in `flake.nix`, `AGENTS.md` and `README.md`. This skill doesn't
+  upgrade the Node.js major. If the user asks for it, change all of them
+  together.
 - Integration tests (`pnpm test:integration`) require Podman or Docker. If
   the container runtime is unavailable, skip that step and inform the user.
 - If `pnpx npm-check-updates` is not available, ask the user to ensure
