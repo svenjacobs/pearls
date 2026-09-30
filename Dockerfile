@@ -1,5 +1,5 @@
 # ── Build stage ───────────────────────────────────────────────────────────────
-FROM node:26-alpine AS builder
+FROM docker.io/library/node:26-alpine AS builder
 
 # node-gyp (required by cpu-features and ssh2 native addons) needs python3, make, g++
 RUN apk add --no-cache python3 make g++
@@ -12,7 +12,7 @@ RUN pnpm install --frozen-lockfile
 RUN pnpm build
 
 # ── Production stage ──────────────────────────────────────────────────────────
-FROM node:26-alpine
+FROM docker.io/library/node:26-alpine
 
 # tini runs as PID 1 and forwards signals (SIGTERM) to Node. Without it Node
 # runs as PID 1 and ignores signals, forcing Docker to SIGKILL after the timeout.
