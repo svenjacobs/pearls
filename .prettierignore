@@ -20,3 +20,7 @@ CHANGELOG.md
 
 # AI instructions
 AGENTS.md
+
+# Inlang generated files (settings.json is the only tracked file)
+/project.inlang/*
+!/project.inlang/settings.json

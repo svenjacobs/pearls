@@ -93,8 +93,7 @@ export const performRoll = async (gameId: string, playerId: string): Promise<Rol
 const CLEARED_ROW_DELAY_MS = 800
 
 export type SelectOutcome =
-  | { status: 'locked' | 'pending-end' }
-  | { status: 'cleared-row' | 'won' | 'completed' }
+  { status: 'locked' | 'pending-end' } | { status: 'cleared-row' | 'won' | 'completed' }
 
 export const performSelect = async (
   gameId: string,
