@@ -36,3 +36,6 @@ vite.config.ts.timestamp-*
 
 # Nix dev shell cache (direnv)
 .direnv/
+
+# Vitest output (attachments, reports)
+/.vitest/
